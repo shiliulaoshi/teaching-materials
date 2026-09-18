@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>动物乐园 Animal Park · 学英语小游戏</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='34' r='22' fill='%23FFD34D'/%3E%3Cellipse cx='24' cy='36' rx='6' ry='8' fill='%23fff'/%3E%3Cellipse cx='40' cy='36' rx='6' ry='8' fill='%23fff'/%3E%3Ccircle cx='24' cy='36' r='3' fill='%23333'/%3E%3Ccircle cx='40' cy='36' r='3' fill='%23333'/%3E%3Cellipse cx='32' cy='46' rx='5' ry='4' fill='%23E86F7A'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Fredoka:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --cream:#FFF8EC; --cream-d:#F4E7CE;
+  --ink:#3B2E2A;
+  --green:#4CAF7D; --green-d:#2E8B5F;
+  --orange:#FF8C42; --orange-d:#E86F1F;
+  --blue:#3EA8FF; --blue-d:#1F7FD9;
+  --yellow:#FFD34D; --pink:#FF9EB5;
+  --muted:#8A7A6F;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Noto Sans SC",system-ui,-apple-system,"Microsoft YaHei",sans-serif;
+  background:linear-gradient(180deg,#DDF3E4 0%,#FDF6E8 40%,#FFF8EC 100%);
+  min-height:100vh;color:var(--ink);
+}
+#bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.cloud{position:absolute;background:#fff;opacity:.85;border-radius:999px;filter:blur(1px)}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud.c1{width:120px;height:34px;top:7%;left:6%}
+.cloud.c1::before{width:52px;height:52px;top:-26px;left:16px}
+.cloud.c1::after{width:38px;height:38px;top:-18px;left:62px}
+.cloud.c2{width:90px;height:26px;top:16%;right:9%}
+.cloud.c2::before{width:40px;height:40px;top:-20px;left:14px}
+.cloud.c2::after{width:30px;height:30px;top:-14px;left:48px}
+.hill{position:absolute;bottom:0;background:linear-gradient(180deg,#7ED0A5,#58B98A);border-radius:50% 50% 0 0}
+.hill.h1{width:340px;height:150px;left:-60px}
+.hill.h2{width:420px;height:190px;right:-80px}
+.hill.h3{width:260px;height:110px;left:32%}
+#app{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:14px 16px 40px}
+.view{display:flex;flex-direction:column;min-height:calc(100vh - 54px)}
+.view[hidden]{display:none}
+.fade-in{animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.btn{font-family:inherit;font-weight:700;cursor:pointer;border-radius:999px;transition:transform .13s}
+.btn:active{transform:translateY(2px)}
+
+/* ===== 大厅 ===== */
+.home-body{display:flex;flex-direction:column;align-items:center;padding-top:24px;text-align:center}
+.logo{font-family:"Fredoka","Noto Sans SC",sans-serif;font-weight:700;font-size:40px;color:var(--green-d);text-shadow:0 3px 0 rgba(255,255,255,.9)}
+.logo-en{font-family:"Fredoka",sans-serif;font-weight:600;font-size:16px;color:var(--orange-d);letter-spacing:4px;margin-top:2px}
+.home-sub{margin-top:12px;font-size:15px;background:rgba(255,255,255,.85);padding:8px 18px;border-radius:999px;font-weight:500}
+.opt-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+.opt-btn{font-family:inherit;font-weight:700;font-size:16px;color:var(--ink);background:#fff;border:3px solid var(--cream-d);border-radius:999px;padding:8px 24px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.opt-btn.sel{background:var(--yellow);border-color:var(--orange);box-shadow:0 3px 0 rgba(0,0,0,.14)}
+.opt-label{font-size:14px;font-weight:700;color:var(--muted);align-self:center}
+.game-cards{display:flex;gap:16px;margin-top:18px;flex-wrap:wrap;justify-content:center}
+.game-card{width:210px;background:#fff;border:4px solid var(--cream-d);border-radius:26px;padding:18px 14px 16px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:0 5px 0 rgba(0,0,0,.08);font-family:inherit;color:var(--ink);transition:transform .15s}
+.game-card:hover{transform:translateY(-3px)}
+.game-card:active{transform:translateY(2px)}
+.game-card .gc-icon{width:96px;height:96px;background:#FFF6E3;border:3px solid var(--cream-d);border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.game-card .gc-icon img{width:100%;height:100%;object-fit:cover}
+.game-card .gc-name{font-size:19px;font-weight:700}
+.game-card .gc-en{font-family:"Fredoka",sans-serif;font-size:13px;color:var(--muted);font-weight:600}
+.game-card .gc-desc{font-size:12.5px;color:var(--muted);line-height:1.5;min-height:38px}
+.start-hint{margin-top:16px;font-size:13px;color:var(--muted)}
+
+/* ===== 游戏页 ===== */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 10px;width:min(700px,96%);margin:0 auto;gap:8px}
+.back-btn{font-family:inherit;font-weight:700;font-size:15px;color:var(--ink);background:#fff;border:3px solid var(--cream-d);border-radius:999px;padding:7px 16px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.game-title{font-family:"Fredoka","Noto Sans SC",sans-serif;font-weight:700;font-size:16px;color:var(--green-d);background:rgba(255,255,255,.9);padding:7px 16px;border-radius:999px}
+.score-pill{font-family:"Fredoka","Noto Sans SC",sans-serif;font-weight:700;font-size:15px;color:var(--ink);background:rgba(255,255,255,.92);padding:7px 14px;border-radius:999px;box-shadow:0 2px 0 rgba(0,0,0,.05);display:flex;align-items:center;gap:6px}
+.score-pill .star{color:var(--orange);letter-spacing:1px}
+.turn-row{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(255,255,255,.94);border-radius:999px;padding:6px 16px;box-shadow:0 3px 0 rgba(0,0,0,.07);width:min(700px,96%);margin:0 auto 8px;flex-wrap:wrap}
+.pchip{display:flex;align-items:center;gap:8px;padding:4px 12px;border-radius:999px;border:3px solid transparent}
+.pchip img{width:38px;height:38px;object-fit:cover;border-radius:50%;border:2px solid var(--cream-d)}
+.pchip .pname{font-weight:700;font-size:14px}
+.pchip .pstars{font-size:13px;color:var(--orange);letter-spacing:1px}
+.pchip.now{background:#FFF7E8;border-color:var(--orange)}
+.turn-msg{font-weight:700;font-size:14px}
+.play-stage{width:min(700px,96%);margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:6px}
+#playArea{width:100%;display:flex;justify-content:center}
+.q-bubble{font-family:"Fredoka","Noto Sans SC",sans-serif;font-weight:600;font-size:22px;color:var(--ink);background:var(--cream-d);border-radius:20px;padding:12px 26px;box-shadow:0 4px 0 rgba(0,0,0,.07);position:relative;text-align:center;max-width:100%}
+.q-bubble::before{content:"";position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);border:9px solid transparent;border-top-color:var(--cream-d)}
+.speak-btn{font-family:inherit;font-weight:700;font-size:14px;color:#fff;background:var(--blue);border:3px solid var(--blue-d);border-radius:999px;padding:8px 20px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.12);display:flex;align-items:center;gap:7px}
+.speak-btn svg{width:16px;height:16px}
+.hint-line{font-size:14px;color:var(--muted)}
+.mute-btn{position:fixed;right:14px;bottom:14px;width:52px;height:52px;border-radius:50%;border:3px solid var(--cream-d);background:#fff;cursor:pointer;z-index:30;box-shadow:0 4px 0 rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center}
+.mute-btn svg{width:26px;height:26px}
+.mute-btn.off{opacity:.5}
+
+/* ===== 捉迷藏 ===== */
+.seek-field{background:#8ED3A5;border:5px solid #5FBE88;border-radius:28px;padding:18px;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;box-shadow:0 6px 0 rgba(0,0,0,.08);position:relative;overflow:hidden}
+.seek-field::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12% 20%,rgba(255,255,255,.25) 0 8px,transparent 9px),radial-gradient(circle at 85% 70%,rgba(255,255,255,.2) 0 6px,transparent 7px);pointer-events:none}
+.spot{position:relative;height:120px;border-radius:20px;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;transition:transform .12s}
+.spot:active{transform:scale(.96)}
+.spot .s-animal{width:108px;height:108px;object-fit:cover;border-radius:50%;border:3px solid rgba(255,255,255,.75);position:relative;z-index:1;background:#fff;transition:all .25s}
+.spot.hard .s-animal{width:94px;height:94px}
+.spot .bush{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:150px;height:58px;z-index:2;pointer-events:none}
+.spot.hard .bush{width:158px;height:64px}
+.spot .bush::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 16% 100%,#3FA56C 0 38%,transparent 39%),radial-gradient(ellipse at 50% 100%,#58C183 0 46%,transparent 47%),radial-gradient(ellipse at 84% 100%,#45B374 0 38%,transparent 39%);clip-path:polygon(0 100%,3% 72%,9% 90%,15% 55%,21% 84%,27% 60%,34% 92%,41% 52%,48% 86%,54% 58%,61% 90%,68% 54%,75% 84%,81% 60%,88% 90%,93% 56%,97% 80%,100% 100%)}
+.spot .bush::after{content:"";position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);width:134px;height:20px;background:radial-gradient(ellipse at 50% 100%,#2F8A56 0 58%,transparent 59%)}
+.spot.found .s-animal{transform:translateY(-46px) scale(1.08)}
+.spot.found .bush{opacity:.55}
+.spot.wrong-shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+/* ===== 打地鼠 ===== */
+.mole-field{background:linear-gradient(180deg,#8ED3A5 0 62%,#6BBF8E 62% 100%);border:5px solid #5FBE88;border-radius:28px;padding:18px;width:100%;box-shadow:0 6px 0 rgba(0,0,0,.08);display:grid;gap:14px}
+.mole-field.easy{grid-template-columns:repeat(3,1fr)}
+.mole-field.hard{grid-template-columns:repeat(3,1fr)}
+.hole{position:relative;height:110px;border-radius:18px;cursor:pointer;overflow:hidden}
+.hole .hole-cover{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:radial-gradient(ellipse at 50% 30%,#5B3A22 0 55%,#3E2816 56% 100%);border-radius:50%;z-index:3;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.hole .h-animal{position:absolute;bottom:6px;left:50%;transform:translate(-50%,115%);width:88px;height:88px;object-fit:cover;border-radius:50%;border:3px solid #fff;z-index:2;transition:transform .22s cubic-bezier(.4,1.4,.5,1)}
+.hole.up .h-animal{transform:translate(-50%,10%)}
+.hole.hit .h-animal{transform:translate(-50%,-60%) scale(.6);opacity:.4;transition:all .18s}
+.hole.whack{animation:whack .25s}
+@keyframes whack{0%,100%{transform:translateX(0)}40%{transform:translateX(-9px) rotate(-12deg)}70%{transform:translateX(6px) rotate(8deg)}}
+
+/* ===== 对对碰 ===== */
+.mem-field{display:grid;gap:12px;width:100%;max-width:560px}
+.mem-field.easy{grid-template-columns:repeat(4,1fr)}
+.mem-field.hard{grid-template-columns:repeat(4,1fr)}
+.mcard{position:relative;height:118px;perspective:600px;cursor:pointer}
+.mcard .inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .4s}
+.mcard.flip .inner{transform:rotateY(180deg)}
+.mcard .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;display:flex;align-items:center;justify-content:center;border:3px solid var(--cream-d);box-shadow:0 3px 0 rgba(0,0,0,.07)}
+.mcard .front{background:repeating-linear-gradient(45deg,#4CAF7D 0 12px,#3FA56C 12px 24px);border-color:#2E8B5F}
+.mcard .front::after{content:"";position:absolute;inset:6px;border:3px dashed rgba(255,255,255,.5);border-radius:10px}
+.mcard .back{background:#fff;transform:rotateY(180deg)}
+.mcard .back img{width:74px;height:74px;object-fit:contain}
+.mcard .back .w{font-family:"Fredoka",sans-serif;font-weight:700;font-size:22px;color:var(--blue)}
+.mcard.matched{opacity:.45;pointer-events:none}
+.mcard.matched .inner{transform:rotateY(180deg)}
+.mcard.hit-flash{animation:popIn .35s}
+@keyframes popIn{from{transform:scale(.7);opacity:.4}to{transform:scale(1);opacity:1}}
+
+/* ===== 结果页 ===== */
+.result-body{display:flex;flex-direction:column;align-items:center;gap:16px;padding-top:26px;text-align:center}
+.result-title{font-family:"Fredoka","Noto Sans SC",sans-serif;font-weight:700;font-size:32px;color:var(--orange-d)}
+.result-sub{font-size:16px;background:rgba(255,255,255,.88);padding:8px 20px;border-radius:999px;font-weight:500}
+.score-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.score-card{background:#fff;border:4px solid var(--cream-d);border-radius:22px;padding:16px 30px;text-align:center;min-width:150px;box-shadow:0 5px 0 rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;gap:6px}
+.score-card.win{border-color:var(--orange);box-shadow:0 5px 0 rgba(0,0,0,.07),0 0 0 5px rgba(255,140,66,.22)}
+.score-card img{width:68px;height:68px;object-fit:cover;border-radius:50%;border:3px solid var(--cream-d)}
+.score-card .sc-name{font-weight:700;font-size:18px}
+.score-card .sc-stars{font-family:"Fredoka",sans-serif;font-weight:700;font-size:22px;color:var(--orange);letter-spacing:2px}
+.score-card .sc-tag{font-size:12px;font-weight:700;color:#fff;background:var(--orange);border-radius:999px;padding:3px 12px}
+.score-card.tie .sc-tag{background:var(--green)}
+.wrong-box{background:#fff;border:4px solid var(--cream-d);border-radius:26px;padding:18px 20px;max-width:560px;width:100%;text-align:left;box-shadow:0 5px 0 rgba(0,0,0,.06)}
+.wrong-box h3{font-weight:700;font-size:17px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.wrong-box h3 svg{width:20px;height:20px}
+.w-row{display:flex;flex-direction:column;gap:4px;background:#FFF9EE;border:2px solid var(--cream-d);border-radius:14px;padding:10px 14px;margin-bottom:8px}
+.w-row .w-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--muted);font-weight:500}
+.w-row .w-head b{color:var(--ink)}
+.w-row .w-body{font-size:14px;font-weight:500;line-height:1.6}
+.w-ok{color:var(--green-d);font-weight:700}
+.w-no{color:#D64550;font-weight:700}
+.result-actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.big-btn{font-family:inherit;font-weight:700;font-size:20px;color:#fff;cursor:pointer;background:var(--green);border:4px solid var(--green-d);border-radius:999px;padding:13px 40px;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+.ghost-btn{font-family:inherit;font-weight:700;font-size:17px;color:var(--ink);background:#fff;border:3px solid var(--cream-d);border-radius:999px;padding:12px 28px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.08)}
+.star-big{position:fixed;font-size:30px;z-index:40;color:var(--yellow);animation:starPop 1.4s ease forwards}
+@keyframes starPop{from{transform:scale(0) rotate(0)}40%{transform:scale(1.4) rotate(20deg)}to{transform:scale(1) rotate(0);opacity:0}}
+@media (max-width:520px){
+  .logo{font-size:32px}
+  .game-card{width:46%;min-width:150px}
+  .seek-field{grid-template-columns:repeat(2,1fr)}
+  .q-bubble{font-size:19px}
+  .mcard{height:100px}
+  .mcard .back img{width:56px;height:56px}
+}
+</style>
+</head>
+<body>
+<div id="bg">
+  <div class="cloud c1"></div><div class="cloud c2"></div>
+  <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+</div>
+
+<div id="app">
+
+  <!-- ===== 大厅 ===== -->
+  <section class="view fade-in" id="view-home">
+    <div class="home-body">
+      <h1 class="logo">动物乐园</h1>
+      <div class="logo-en">ANIMAL PARK</div>
+      <p class="home-sub">三个小游戏，认识农场和动物园的动物</p>
+      <div class="opt-row">
+        <span class="opt-label">模式</span>
+        <button class="opt-btn sel" data-mode="single">单人玩</button>
+        <button class="opt-btn" data-mode="duo">双人对战</button>
+      </div>
+      <div class="opt-row">
+        <span class="opt-label">难度</span>
+        <button class="opt-btn sel" data-level="easy">简单</button>
+        <button class="opt-btn" data-level="hard">困难</button>
+      </div>
+      <div class="game-cards">
+        <button class="game-card" data-game="seek">
+          <div class="gc-icon"><img src="assets/duck.png" alt="捉迷藏"></div>
+          <div class="gc-name">动物捉迷藏</div>
+          <div class="gc-en">Find the Animal</div>
+          <div class="gc-desc">动物藏在草丛后，听提示找到目标动物</div>
+        </button>
+        <button class="game-card" data-game="mole">
+          <div class="gc-icon"><img src="assets/pig.png" alt="打地鼠"></div>
+          <div class="gc-name">动物打地鼠</div>
+          <div class="gc-en">Whack-a-Mole</div>
+          <div class="gc-desc">听到英文名，快速击打冒出来的动物</div>
+        </button>
+        <button class="game-card" data-game="memory">
+          <div class="gc-icon"><img src="assets/tiger.png" alt="对对碰"></div>
+          <div class="gc-name">动物对对碰</div>
+          <div class="gc-en">Memory Match</div>
+          <div class="gc-desc">翻开卡片，让动物图片和英文单词配成对</div>
+        </button>
+      </div>
+      <p class="start-hint">选好模式和难度，点卡片开始</p>
+    </div>
+  </section>
+
+  <!-- ===== 游戏 ===== -->
+  <section class="view fade-in" id="view-game" hidden>
+    <header class="topbar">
+      <button class="back-btn" id="gameBack">返回</button>
+      <div class="game-title" id="gameTitle">动物捉迷藏</div>
+      <div class="score-pill" id="scorePill">0</div>
+    </header>
+    <div class="turn-row" id="turnRow" hidden></div>
+    <div class="play-stage">
+      <div class="q-bubble" id="qBubble"></div>
+      <button class="speak-btn" id="qSpeak">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path d="M16 9c1.5 1.5 1.5 4.5 0 6M18.5 6.5c3 3 3 8 0 11" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        再听一遍
+      </button>
+      <div id="playArea"></div>
+      <p class="hint-line" id="hintLine"></p>
+    </div>
+  </section>
+
+  <!-- ===== 结果 ===== -->
+  <section class="view fade-in" id="view-result" hidden>
+    <div class="result-body">
+      <h2 class="result-title" id="resultTitle">玩完啦！</h2>
+      <p class="result-sub" id="resultSub"></p>
+      <div class="score-cards" id="scoreCards"></div>
+      <div class="wrong-box" id="wrongBox" hidden>
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L15 8.5L22 9.3L17 14.1L18.2 21L12 17.8L5.8 21L7 14.1L2 9.3L9 8.5L12 2z" fill="#FFD34D" stroke="#E8A63B" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          错题回顾
+        </h3>
+        <div id="wrongList"></div>
+      </div>
+      <div class="result-actions">
+        <button class="big-btn" id="replayBtn">再玩一次</button>
+        <button class="ghost-btn" id="homeBtn">回大厅</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<button class="mute-btn" id="muteBtn" title="声音开关">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#3B2E2A"/><path class="wave" d="M16 9c1.5 1.5 1.5 4.5 0 6M18.5 6.5c3 3 3 8 0 11" stroke="#3B2E2A" stroke-width="2" stroke-linecap="round"/></svg>
+</button>
+
+<!-- 图池 -->
+<div id="imgPool" hidden>
+  <img id="img-duck" src="assets/duck.png" alt="duck">
+  <img id="img-hen" src="assets/hen.png" alt="hen">
+  <img id="img-cow" src="assets/cow.png" alt="cow">
+  <img id="img-horse" src="assets/horse.png" alt="horse">
+  <img id="img-sheep" src="assets/sheep.png" alt="sheep">
+  <img id="img-pig" src="assets/pig.png" alt="pig">
+  <img id="img-elephant" src="assets/elephant.png" alt="elephant">
+  <img id="img-tiger" src="assets/tiger.png" alt="tiger">
+  <img id="img-lion" src="assets/lion.png" alt="lion">
+  <img id="img-monkey" src="assets/monkey.png" alt="monkey">
+  <img id="img-panda" src="assets/panda.png" alt="panda">
+  <img id="img-giraffe" src="assets/giraffe.png" alt="giraffe">
+</div>
+
+<!-- 语音池 -->
+<div id="audioPool" hidden>
+  <audio id="audio-n-duck" src="assets/voice/n-duck.mp3" preload="auto"></audio>
+  <audio id="audio-n-hen" src="assets/voice/n-hen.mp3" preload="auto"></audio>
+  <audio id="audio-n-cow" src="assets/voice/n-cow.mp3" preload="auto"></audio>
+  <audio id="audio-n-horse" src="assets/voice/n-horse.mp3" preload="auto"></audio>
+  <audio id="audio-n-sheep" src="assets/voice/n-sheep.mp3" preload="auto"></audio>
+  <audio id="audio-n-pig" src="assets/voice/n-pig.mp3" preload="auto"></audio>
+  <audio id="audio-n-elephant" src="assets/voice/n-elephant.mp3" preload="auto"></audio>
+  <audio id="audio-n-tiger" src="assets/voice/n-tiger.mp3" preload="auto"></audio>
+  <audio id="audio-n-lion" src="assets/voice/n-lion.mp3" preload="auto"></audio>
+  <audio id="audio-n-monkey" src="assets/voice/n-monkey.mp3" preload="auto"></audio>
+  <audio id="audio-n-panda" src="assets/voice/n-panda.mp3" preload="auto"></audio>
+  <audio id="audio-n-giraffe" src="assets/voice/n-giraffe.mp3" preload="auto"></audio>
+  <audio id="audio-f-duck" src="assets/voice/f-duck.mp3" preload="auto"></audio>
+  <audio id="audio-f-hen" src="assets/voice/f-hen.mp3" preload="auto"></audio>
+  <audio id="audio-f-cow" src="assets/voice/f-cow.mp3" preload="auto"></audio>
+  <audio id="audio-f-horse" src="assets/voice/f-horse.mp3" preload="auto"></audio>
+  <audio id="audio-f-sheep" src="assets/voice/f-sheep.mp3" preload="auto"></audio>
+  <audio id="audio-f-pig" src="assets/voice/f-pig.mp3" preload="auto"></audio>
+  <audio id="audio-f-elephant" src="assets/voice/f-elephant.mp3" preload="auto"></audio>
+  <audio id="audio-f-tiger" src="assets/voice/f-tiger.mp3" preload="auto"></audio>
+  <audio id="audio-f-lion" src="assets/voice/f-lion.mp3" preload="auto"></audio>
+  <audio id="audio-f-monkey" src="assets/voice/f-monkey.mp3" preload="auto"></audio>
+  <audio id="audio-f-panda" src="assets/voice/f-panda.mp3" preload="auto"></audio>
+  <audio id="audio-f-giraffe" src="assets/voice/f-giraffe.mp3" preload="auto"></audio>
+  <audio id="audio-fe-longnose" src="assets/voice/fe-longnose.mp3" preload="auto"></audio>
+  <audio id="audio-fe-bigears" src="assets/voice/fe-bigears.mp3" preload="auto"></audio>
+  <audio id="audio-fe-longneck" src="assets/voice/fe-longneck.mp3" preload="auto"></audio>
+  <audio id="audio-fe-longtail" src="assets/voice/fe-longtail.mp3" preload="auto"></audio>
+  <audio id="audio-fe-longarms" src="assets/voice/fe-longarms.mp3" preload="auto"></audio>
+  <audio id="audio-fe-wings" src="assets/voice/fe-wings.mp3" preload="auto"></audio>
+  <audio id="audio-fe-tall" src="assets/voice/fe-tall.mp3" preload="auto"></audio>
+  <audio id="audio-fe-big" src="assets/voice/fe-big.mp3" preload="auto"></audio>
+  <audio id="audio-fe-cute" src="assets/voice/fe-cute.mp3" preload="auto"></audio>
+  <audio id="audio-fb-great" src="assets/voice/fb-great.mp3" preload="auto"></audio>
+  <audio id="audio-fb-try" src="assets/voice/fb-try.mp3" preload="auto"></audio>
+  <audio id="audio-fb-done" src="assets/voice/fb-done.mp3" preload="auto"></audio>
+  <audio id="audio-fb-time" src="assets/voice/fb-time.mp3" preload="auto"></audio>
+</div>
+
+<script>
+'use strict';
+/* ===== 数据 ===== */
+const ANIMALS = {
+  duck:{zh:'鸭子'}, hen:{zh:'母鸡'}, cow:{zh:'奶牛'}, horse:{zh:'马'}, sheep:{zh:'绵羊'}, pig:{zh:'猪'},
+  elephant:{zh:'大象'}, tiger:{zh:'老虎'}, lion:{zh:'狮子'}, monkey:{zh:'猴子'}, panda:{zh:'熊猫'}, giraffe:{zh:'长颈鹿'}
+};
+const FARM = ['duck','hen','cow','horse','sheep','pig'];
+const ALL = ['duck','hen','cow','horse','sheep','pig','elephant','tiger','lion','monkey','panda','giraffe'];
+const FEATURES = {
+  elephant:['fe-longnose','fe-bigears','fe-big'],
+  giraffe:['fe-longneck','fe-tall'],
+  tiger:['fe-longtail'],
+  monkey:['fe-longarms']
+};
+const FEAT_EXCLUDE = { 'elephant_fe-big':['lion'], 'tiger_fe-longtail':['monkey'] };
+const GAME_META = {
+  seek:{name:'动物捉迷藏', en:'Find the Animal'},
+  mole:{name:'动物打地鼠', en:'Whack-a-Mole'},
+  memory:{name:'动物对对碰', en:'Memory Match'}
+};
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function ri(min,max){ return min + Math.floor(Math.random()*(max-min+1)); }
+function imgByKey(key){ return document.getElementById('img-'+key).cloneNode(true); }
+function el(tag, cls, html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
+
+/* ===== 语音 ===== */
+let soundOn = true;
+let voiceEl = null;
+function speak(key){
+  if(!soundOn) return;
+  stopSpeak();
+  const a = document.getElementById('audio-' + key);
+  if(a){ a.currentTime=0; const pr=a.play(); if(pr&&pr.catch) pr.catch(()=>{}); }
+}
+function stopSpeak(){ if(voiceEl){ try{voiceEl.pause();}catch(e){} } }
+let actx = null;
+function ensureAudio(){
+  if(!actx){ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null; actx=new AC(); }
+  if(actx.state==='suspended') actx.resume();
+  return actx;
+}
+function beep(f,d,t,v,dl){
+  if(!soundOn) return;
+  const ctx=ensureAudio(); if(!ctx) return;
+  const t0=ctx.currentTime+(dl||0);
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type=t||'sine'; o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(v||0.18,t0+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+d);
+  o.connect(g).connect(ctx.destination); o.start(t0); o.stop(t0+d+0.05);
+}
+function sfxCorrect(){ beep(523,0.12,'sine',0.2); beep(659,0.12,'sine',0.2,0.11); beep(784,0.22,'sine',0.22,0.22); }
+function sfxWrong(){ beep(196,0.22,'sawtooth',0.12); beep(147,0.3,'sawtooth',0.12,0.16); }
+function sfxWin(){ [523,659,784,1047].forEach((f,i)=>beep(f,0.16,'triangle',0.22,i*0.13)); }
+function burstStars(originEl){
+  const fx=el('div','star-fx'); fx.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:50';
+  document.body.appendChild(fx);
+  const r=originEl.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
+  for(let i=0;i<10;i++){
+    const s=el('span','star-big','★');
+    s.style.left=(cx+(Math.random()*110-55))+'px';
+    s.style.top=(cy+(Math.random()*30-10))+'px';
+    s.style.animationDelay=(Math.random()*0.2)+'s';
+    fx.appendChild(s);
+  }
+  setTimeout(()=>fx.remove(),1500);
+}
+
+/* ===== 状态 ===== */
+let mode='single', level='easy', game='seek';
+let myName='Ben', p1Hero='duck', p2Hero='tiger';
+let scores=[0,0], current=0, turnCount=0;
+let qIndex=0, qTotal=0, locked=false, q=null;
+let wrongLog=[];
+
+/* ===== 视图 ===== */
+const VIEWS={home:'view-home',game:'view-game',result:'view-result'};
+function showView(name){ stopSpeak(); Object.keys(VIEWS).forEach(k=>{ document.getElementById(VIEWS[k]).hidden=(k!==name); }); }
+
+/* ===== 大厅 ===== */
+document.querySelectorAll('.opt-btn[data-mode]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    mode=b.dataset.mode;
+    document.querySelectorAll('.opt-btn[data-mode]').forEach(x=>x.classList.toggle('sel',x===b));
+  });
+});
+document.querySelectorAll('.opt-btn[data-level]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    level=b.dataset.level;
+    document.querySelectorAll('.opt-btn[data-level]').forEach(x=>x.classList.toggle('sel',x===b));
+  });
+});
+document.querySelectorAll('.game-card').forEach(c=>{
+  c.addEventListener('click',()=>{ game=c.dataset.game; startGame(); });
+});
+
+/* ===== 开始 ===== */
+function startGame(){
+  if(moleTimer){ clearTimeout(moleTimer); moleTimer=null; }
+  scores=[0,0]; wrongLog=[]; qIndex=0; turnCount=0; current=0;
+  moleTargets=[]; seekUsed=[];
+  if(game==='seek'){ qTotal = level==='easy'?4:6; }
+  else if(game==='mole'){ qTotal = level==='easy'?6:8; }
+  else { qTotal = level==='easy'?4:6; } // 对对碰配对对数
+  showView('game');
+  document.getElementById('gameTitle').textContent = GAME_META[game].name + (level==='easy'?' · 简单':' · 困难');
+  updateTurnUI();
+  if(game==='seek') seekNext();
+  else if(game==='mole') moleRound();
+  else memStart();
+}
+function resetOpts(){
+  mode='single'; level='easy';
+  document.querySelectorAll('.opt-btn[data-mode]').forEach(x=>x.classList.toggle('sel',x.dataset.mode==='single'));
+  document.querySelectorAll('.opt-btn[data-level]').forEach(x=>x.classList.toggle('sel',x.dataset.level==='easy'));
+}
+document.getElementById('gameBack').addEventListener('click',()=>{ resetOpts(); showView('home'); });
+document.getElementById('homeBtn').addEventListener('click',()=>{ resetOpts(); showView('home'); });
+document.getElementById('replayBtn').addEventListener('click',startGame);
+document.getElementById('qSpeak').addEventListener('click',()=>{ if(q && q.qKey) speak(q.qKey); });
+const muteBtn=document.getElementById('muteBtn');
+muteBtn.addEventListener('click',()=>{ soundOn=!soundOn; muteBtn.classList.toggle('off',!soundOn); if(!soundOn) stopSpeak(); });
+
+function updateTurnUI(){
+  const show=(mode==='duo');
+  const elm=document.getElementById('turnRow');
+  elm.hidden=!show;
+  if(!show) return;
+  elm.innerHTML='';
+  [0,1].forEach(p=>{
+    const chip=el('div','pchip'+(p===current?' now':''));
+    const im=imgByKey(p===0?p1Hero:p2Hero);
+    im.style.cssText='width:38px;height:38px;object-fit:cover;border-radius:50%;border:2px solid var(--cream-d)';
+    chip.appendChild(im);
+    const nm=el('span','pname',(p===0?'1P ':'2P ')+(p===0?'Ben':'Amy'));
+    chip.appendChild(nm);
+    const st=el('span','pstars','★'.repeat(scores[p]));
+    chip.appendChild(st);
+    elm.appendChild(chip);
+  });
+  const msg=el('span','turn-msg','轮到 '+(current===0?'1P':'2P')+'！');
+  elm.appendChild(msg);
+}
+function setPill(){
+  const pill=document.getElementById('scorePill');
+  if(mode==='duo') pill.innerHTML='<span class="star">★</span> '+(scores[0]+scores[1]);
+  else pill.innerHTML='<span class="star">★</span> '+scores[0];
+}
+function nextTurn(){
+  if(mode==='duo'){ current=1-current; updateTurnUI(); }
+}
+function logWrong(desc, correct, wrong){
+  wrongLog.push({player: mode==='duo'?(current===0?'1P':'2P'):'我', desc:desc, correct:correct, wrong:wrong});
+}
+function speakFind(animal, featureKey){
+  // 简单：报名字；困难：报特征句
+  const key = (level==='easy' || !featureKey) ? 'f-'+animal : featureKey;
+  return key;
+}
+
+/* ===== 游戏1 捉迷藏 ===== */
+let seekTarget=null, seekFound=false, seekUsed=[];
+function seekNext(){
+  if(document.getElementById('view-game').hidden) return;
+  locked=false; seekFound=false;
+  if(qIndex>=qTotal){ showResult(); return; }
+  const pool = level==='easy' ? FARM : ALL;
+  // 题目去重：优先从未用过的动物里抽，用完一轮后重置
+  let candidates = pool.filter(a=>seekUsed.indexOf(a)<0);
+  if(!candidates.length){ seekUsed=[]; candidates=pool.slice(); }
+  const target = candidates[ri(0,candidates.length-1)];
+  seekUsed.push(target);
+  seekTarget = target;
+  const nSpots = 6;
+  // 特征题：先定特征，干扰项排除同特征的动物，避免歧义
+  const feats=FEATURES[target]||[];
+  const featKey = level==='hard' && feats.length ? feats[ri(0,feats.length-1)] : null;
+  const excl = (featKey && FEAT_EXCLUDE[target+'_'+featKey]) ? FEAT_EXCLUDE[target+'_'+featKey] : [];
+  const others = shuffle(pool.filter(a=>a!==target && excl.indexOf(a)<0)).slice(0, nSpots-1);
+  const spotAnimals = shuffle([target].concat(others));
+  const field = el('div','seek-field');
+  spotAnimals.forEach((a,i)=>{
+    const spot=el('div','spot'+(level==='hard'?' hard':''));
+    spot.dataset.animal=a;
+    const im=imgByKey(a);
+    im.className='s-animal';
+    spot.appendChild(im);
+    const bush=el('div','bush');
+    spot.appendChild(bush);
+    spot.addEventListener('click',()=>seekClick(spot));
+    field.appendChild(spot);
+  });
+  const area=document.getElementById('playArea');
+  area.innerHTML='';
+  area.appendChild(field);
+  q={type:'seek', animal:target, qKey: speakFind(target, featKey)};
+  const featText = {'fe-longnose':'It has a long nose.','fe-bigears':'It has two big ears.','fe-longneck':'It has a long neck.','fe-longtail':'It has a long tail.','fe-longarms':'It has long arms.','fe-tall':'It is tall.','fe-big':'It\'s so big.'};
+  const bubble=document.getElementById('qBubble');
+  if(level==='hard' && featKey){
+    bubble.textContent = featText[featKey] + '  Find it!';
+  }else{
+    bubble.textContent = 'Find the ' + target + '!';
+  }
+  document.getElementById('hintLine').textContent = '第 '+(qIndex+1)+' / '+qTotal+' 题 · 点击找到的动物';
+  setTimeout(()=>speak(q.qKey), 350);
+}
+function seekClick(spot){
+  if(locked) return;
+  if(spot.dataset.animal===seekTarget){
+    locked=true;
+    spot.classList.add('found');
+    burstStars(spot);
+    sfxCorrect();
+    speak('fb-great');
+    scores[current]++;
+    setTimeout(()=>speak('n-'+seekTarget), 500);
+    setTimeout(()=>{ if(!document.getElementById('view-game').hidden){ qIndex++; nextTurn(); setPill(); seekNext(); } }, 1600);
+  }else{
+    spot.classList.add('wrong-shake');
+    sfxWrong();
+    speak('fb-try');
+    setTimeout(()=>spot.classList.remove('wrong-shake'), 500);
+    setTimeout(()=>speak(q.qKey), 900);
+  }
+}
+
+/* ===== 游戏2 打地鼠：每轮多只动物同时冒出 ===== */
+let moleTargets=[], moleIdx=0, moleHits=0, moleTimer=null;
+function moleRound(){
+  locked=false; moleIdx=0;
+  const pool = level==='easy' ? FARM : ALL;
+  if(!moleTargets.length){ moleTargets = shuffle(pool).slice(0, qTotal); }
+  renderMoleField();
+  moleNext();
+}
+function renderMoleField(){
+  const nHoles = level==='easy' ? 6 : 9;
+  const field=el('div','mole-field'+(level==='hard'?' hard':' easy'));
+  for(let i=0;i<nHoles;i++){
+    const hole=el('div','hole');
+    hole.dataset.idx=i;
+    const cover=el('div','hole-cover');
+    hole.appendChild(cover);
+    hole.addEventListener('click',()=>moleClick(hole));
+    field.appendChild(hole);
+  }
+  const area=document.getElementById('playArea');
+  area.innerHTML='';
+  area.appendChild(field);
+  document.getElementById('qBubble').textContent = mode==='duo' ? ('轮到 '+(current===0?'1P':'2P')+' 出击！') : '听到名字，快点击目标动物！';
+  document.getElementById('hintLine').textContent = '第 '+(qIndex+1)+' / '+qTotal+' 题 · 点错或超时都算错';
+}
+function clearHoles(){
+  document.querySelectorAll('.hole').forEach(h=>{
+    h.innerHTML='';
+    h.appendChild(el('div','hole-cover'));
+    h.dataset.animal='';
+    h.classList.remove('up','hit','whack');
+  });
+}
+function moleNext(){
+  if(document.getElementById('view-game').hidden) return;
+  if(moleIdx>=moleTargets.length){
+    setPill();
+    qIndex=qTotal;
+    showResult();
+    return;
+  }
+  if(mode==='duo' && moleIdx>0){ nextTurn(); }
+  clearHoles();
+  const pool = level==='easy' ? FARM : ALL;
+  const animal=moleTargets[moleIdx];
+  // 每轮同时冒出：简单 2 只（1 目标 + 1 干扰），困难 3 只（1 目标 + 2 干扰）
+  const distN = level==='easy' ? 1 : 2;
+  const distractors = shuffle(pool.filter(a=>a!==animal)).slice(0, distN);
+  const upList = shuffle([animal].concat(distractors));
+  const holes = shuffle([...document.querySelectorAll('.hole')]);
+  upList.forEach((a,i)=>{
+    const hole=holes[i];
+    const im=imgByKey(a);
+    im.className='h-animal';
+    hole.appendChild(im);
+    hole.dataset.animal=a;
+    hole.classList.add('up');
+  });
+  const feats=FEATURES[animal]||[];
+  const featKey = level==='hard' && feats.length ? feats[ri(0,feats.length-1)] : null;
+  q={type:'mole', animal:animal, qKey:(level==='hard'&&featKey)?featKey:'n-'+animal};
+  const featText = {'fe-longnose':'It has a long nose.','fe-bigears':'It has two big ears.','fe-longneck':'It has a long neck.','fe-longtail':'It has a long tail.','fe-longarms':'It has long arms.','fe-tall':'It is tall.','fe-big':'It\'s so big.'};
+  document.getElementById('qBubble').textContent = level==='hard' && featKey
+    ? featText[featKey]
+    : ('Hit the ' + animal + '!');
+  speak(q.qKey);
+  const dwell = (window.__MOLE_DWELL__ ? window.__MOLE_DWELL__ : (level==='easy' ? 2400 : 1800));
+  moleTimer=setTimeout(()=>{
+    moleTimer=null;
+    if(document.getElementById('view-game').hidden) return;
+    const targetUp=[...document.querySelectorAll('.hole')].find(h=>h.dataset.animal===animal && !h.classList.contains('hit'));
+    if(targetUp){
+      sfxWrong();
+      logWrong('打地鼠 · 没来得及点', animal+'('+ANIMALS[animal].zh+')', '没点中');
+    }
+    moleIdx++;
+    moleNext();
+  }, dwell);
+}
+function moleClick(hole){
+  if(locked) return;
+  const animal=hole.dataset.animal;
+  if(!animal || !hole.classList.contains('up')){ return; }
+  if(animal===q.animal){
+    locked=true;
+    hole.classList.add('hit');
+    clearTimeout(moleTimer);
+    sfxCorrect();
+    burstStars(hole);
+    scores[current]++;
+    setPill();
+    speak('n-'+animal);
+    setTimeout(()=>{ locked=false; if(!document.getElementById('view-game').hidden){ moleIdx++; moleNext(); } }, 800);
+  }else{
+    hole.classList.add('whack');
+    sfxWrong();
+    speak('fb-try');
+    logWrong('打地鼠 · 点错动物', q.animal+'('+ANIMALS[q.animal].zh+')', animal+'('+ANIMALS[animal].zh+')');
+    setTimeout(()=>hole.classList.remove('whack'), 300);
+  }
+}
+
+/* ===== 游戏3 对对碰 ===== */
+let memPairs=[], memCards=[], memOpen=[], memMatched=0, memLocked=false;
+function memStart(){
+  memMatched=0; memOpen=[];
+  const pool = level==='easy' ? FARM.slice(0,4) : shuffle(ALL).slice(0,6);
+  memPairs = pool;
+  memCards = shuffle(pool.map(a=>({type:'img',a})).concat(pool.map(a=>({type:'word',a}))));
+  renderMem();
+  document.getElementById('qBubble').textContent = mode==='duo' ? ('轮到 '+(current===0?'1P':'2P')+' 翻牌！') : '翻两张牌，让图片和单词配对！';
+  document.getElementById('hintLine').textContent = '配成 '+(level==='easy'?4:6)+' 对就赢 · 图片 + 单词';
+  q={type:'memory'};
+}
+function renderMem(){
+  const field=el('div','mem-field '+(level==='hard'?'hard':' easy'));
+  memCards.forEach((c,i)=>{
+    const card=el('div','mcard');
+    card.dataset.i=i;
+    card.innerHTML = '<div class="inner"><div class="face front"></div><div class="face back">'+
+      (c.type==='img' ? '<img src="assets/'+c.a+'.png" alt="">' : '<span class="w">'+c.a+'</span>')+
+      '</div></div>';
+    card.addEventListener('click',()=>memFlip(card,i));
+    field.appendChild(card);
+  });
+  const area=document.getElementById('playArea');
+  area.innerHTML='';
+  area.appendChild(field);
+}
+function memFlip(card,i){
+  if(memLocked) return;
+  if(card.classList.contains('flip')||card.classList.contains('matched')) return;
+  card.classList.add('flip');
+  const c=memCards[i];
+  if(c.type==='word') speak('n-'+c.a);
+  memOpen.push(i);
+  if(memOpen.length===2){
+    memLocked=true;
+    const [i1,i2]=memOpen;
+    const c1=memCards[i1], c2=memCards[i2];
+    const cards=[...document.querySelectorAll('.mcard')];
+    if(c1.a===c2.a && c1.type!==c2.type){
+      setTimeout(()=>{
+        if(document.getElementById('view-game').hidden) return;
+        cards[i1].classList.add('matched');
+        cards[i2].classList.add('matched');
+        sfxCorrect();
+        speak('n-'+c1.a);
+        scores[current]++;
+        setPill();
+        memMatched++;
+        memOpen=[];
+        memLocked=false;
+        if(memMatched>=memPairs.length){
+          setTimeout(showResult, 900);
+        }else{
+          nextTurn();
+          document.getElementById('qBubble').textContent = mode==='duo' ? ('轮到 '+(current===0?'1P':'2P')+' 翻牌！') : '继续配对吧！';
+        }
+      }, 500);
+    }else{
+      setTimeout(()=>{
+        if(document.getElementById('view-game').hidden) return;
+        cards[i1].classList.remove('flip');
+        cards[i2].classList.remove('flip');
+        sfxWrong();
+        memOpen=[];
+        memLocked=false;
+        if(mode==='duo'){
+          nextTurn();
+          document.getElementById('qBubble').textContent = '轮到 '+(current===0?'1P':'2P')+' 翻牌！';
+        }
+      }, 900);
+    }
+  }
+}
+
+/* ===== 结果 ===== */
+function showResult(){
+  showView('result');
+  sfxWin();
+  if(game==='memory' && mode==='single'){
+    // 单人对对碰没有星，用配对数和尝试次数
+    const cards=[...document.querySelectorAll('.mcard')];
+    const tries = memPairs.length*2;
+    document.getElementById('resultTitle').textContent='配完啦！';
+    document.getElementById('resultSub').textContent='成功配对 '+(memMatched||memPairs.length)+' 对动物！';
+    renderScoreCards([{name:'我', stars:memMatched||memPairs.length, win:false}]);
+  }else{
+    document.getElementById('resultTitle').textContent='玩完啦！';
+    const name=(p)=>p===0?'1P':'2P';
+    if(mode==='duo'){
+      document.getElementById('resultSub').textContent='1P '+scores[0]+' 分 · 2P '+scores[1]+' 分'+(scores[0]===scores[1]?'，平局！':('，'+(scores[0]>scores[1]?'1P':'2P')+' 赢啦！'));
+      renderScoreCards([{name:'1P',stars:scores[0],win:scores[0]>scores[1]},{name:'2P',stars:scores[1],win:scores[1]>scores[0]}]);
+    }else{
+      document.getElementById('resultSub').textContent='答对 '+scores[0]+' 题，继续加油！';
+      renderScoreCards([{name:'我',stars:scores[0],win:false}]);
+    }
+  }
+  // 错题回顾
+  const wrongBox=document.getElementById('wrongBox');
+  const wrongList=document.getElementById('wrongList');
+  wrongList.innerHTML='';
+  if(wrongLog.length){
+    wrongBox.hidden=false;
+    wrongLog.forEach(r=>{
+      wrongList.appendChild(el('div','w-row',
+        '<div class="w-head"><b>'+r.desc+'</b><span>'+r.player+'</span></div>'+
+        '<div class="w-body">正确答案 <span class="w-ok">'+r.correct+'</span>　你选了 <span class="w-no">'+r.wrong+'</span></div>'));
+    });
+  }else{
+    wrongBox.hidden=true;
+  }
+}
+function renderScoreCards(list){
+  const box=document.getElementById('scoreCards');
+  box.innerHTML='';
+  list.forEach((item,idx)=>{
+    const c=el('div','score-card'+(item.win?' win':'')+((list.length>1&&scores[0]===scores[1])?' tie':''));
+    const im=imgByKey(idx===0?p1Hero:p2Hero); im.className='sc-img'; c.appendChild(im);
+    const nm=el('div','sc-name',item.name); c.appendChild(nm);
+    const st=el('div','sc-stars','★'.repeat(Math.max(0,item.stars))); c.appendChild(st);
+    if(item.win){ c.appendChild(el('div','sc-tag','赢家')); }
+    box.appendChild(c);
+  });
+}
+
+showView('home');
+</script>
+</body>
+</html>

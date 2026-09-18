@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>森林数字列车 Number Train · 学英语小游戏</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='8' y='22' width='40' height='22' rx='8' fill='%233EA8FF'/%3E%3Crect x='44' y='30' width='14' height='14' rx='4' fill='%232E9E6B'/%3E%3Ccircle cx='18' cy='48' r='7' fill='%23333'/%3E%3Ccircle cx='38' cy='48' r='7' fill='%23333'/%3E%3Ccircle cx='18' cy='48' r='3' fill='%23fff'/%3E%3Ccircle cx='38' cy='48' r='3' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Fredoka:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --cream:#FFF8EC; --cream-d:#F4E7CE;
+  --ink:#3B2E2A;
+  --green:#4CAF7D; --green-d:#2E8B5F;
+  --orange:#FF8C42; --orange-d:#E86F1F;
+  --blue:#3EA8FF; --blue-d:#1F7FD9;
+  --yellow:#FFD34D; --pink:#FF9EB5;
+  --muted:#8A7A6F;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Noto Sans SC",system-ui,-apple-system,"Microsoft YaHei",sans-serif;
+  background:linear-gradient(180deg,#DDF3E4 0%,#FDF6E8 40%,#FFF8EC 100%);
+  min-height:100vh;color:var(--ink);
+}
+#bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.cloud{position:absolute;background:#fff;opacity:.85;border-radius:999px;filter:blur(1px)}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud.c1{width:120px;height:34px;top:7%;left:6%}
+.cloud.c1::before{width:52px;height:52px;top:-26px;left:16px}
+.cloud.c1::after{width:38px;height:38px;top:-18px;left:62px}
+.cloud.c2{width:90px;height:26px;top:16%;right:9%}
+.cloud.c2::before{width:40px;height:40px;top:-20px;left:14px}
+.cloud.c2::after{width:30px;height:30px;top:-14px;left:48px}
+.cloud.c3{width:70px;height:20px;top:4%;left:46%}
+.cloud.c3::before{width:30px;height:30px;top:-15px;left:12px}
+.cloud.c3::after{width:22px;height:22px;top:-10px;left:38px}
+.hill{position:absolute;bottom:0;background:linear-gradient(180deg,#7ED0A5,#58B98A);border-radius:50% 50% 0 0}
+.hill.h1{width:340px;height:150px;left:-60px}
+.hill.h2{width:420px;height:190px;right:-80px}
+.hill.h3{width:260px;height:110px;left:32%}
+#app{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:14px 16px 40px}
+.view{display:flex;flex-direction:column;min-height:calc(100vh - 54px)}
+.view[hidden]{display:none}
+.fade-in{animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ===== 主页 ===== */
+.home-body{display:flex;flex-direction:column;align-items:center;padding-top:26px;text-align:center}
+.logo{font-family:"Fredoka","Noto Sans SC",sans-serif;font-weight:700;font-size:42px;color:var(--green-d);text-shadow:0 3px 0 rgba(255,255,255,.9);letter-spacing:1px}
+.logo-en{font-family:"Fredoka",sans-serif;font-weight:600;font-size:16px;color:var(--orange-d);letter-spacing:4px;margin-top:2px}
+.home-sub{margin-top:14px;font-size:15px;color:var(--ink);background:rgba(255,255,255,.85);padding:8px 18px;border-radius:999px;font-weight:500}
+.mode-pick{display:flex;gap:10px;margin-top:16px}
+.mode-btn{font-family:inherit;font-weight:700;font-size:16px;color:var(--ink);background:#fff;border:3px solid var(--cream-d);border-radius:999px;padding:8px 24px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.08);transition:transform .15s}
+.mode-btn:active{transform:translateY(2px)}
+.mode-btn.sel{background:var(--yellow);border-color:var(--orange);box-shadow:0 3px 0 rgba(0,0,0,.14)}
+.pick-title{margin-top:20px;font-weight:700;font-size:17px;color:var(--ink);background:rgba(255,255,255,.85);padding:6px 16px;border-radius:999px}
+.hero-cards{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+.hero-card{position:relative;width:130px;background:#fff;border:4px solid var(--cream-d);border-radius:24px;padding:14px 10px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 5px 0 rgba(0,0,0,.08);transition:transform .15s;font-family:inherit;color:var(--ink)}
+.hero-card img{width:92px;height:92px;object-fit:cover;border-radius:50%;background:#fff;border:3px solid var(--cream-d)}
+.hero-card span{font-weight:700;font-size:17px}
+.hero-card.sel{border-color:var(--orange);box-shadow:0 5px 0 rgba(0,0,0,.08),0 0 0 5px rgba(255,140,66,.25)}
+.hero-card:active{transform:translateY(3px)}
+.hero-card .tag{position:absolute;top:-10px;right:-10px;background:var(--orange);color:#fff;font-size:14px;font-weight:700;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.hero-card.p1{border-color:var(--blue);box-shadow:0 5px 0 rgba(0,0,0,.08),0 0 0 5px rgba(62,168,255,.22)}
+.hero-card.p2{border-color:var(--orange);box-shadow:0 5px 0 rgba(0,0,0,.08),0 0 0 5px rgba(255,140,66,.25)}
+.hero-card.taken{opacity:.5;cursor:not-allowed}
+.name-row{margin-top:14px;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.9);padding:8px 16px;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.06)}
+.name-row label{font-weight:700;font-size:15px}
+.name-row input{font-family:"Fredoka","Noto Sans SC",sans-serif;font-size:17px;font-weight:600;width:110px;text-align:center;border:2px solid var(--cream-d);border-radius:999px;padding:6px 10px;outline:none;background:#fff;color:var(--ink)}
+.name-row input:focus{border-color:var(--blue)}
+.start-area{margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.big-btn{font-family:inherit;font-weight:700;font-size:22px;color:#fff;cursor:pointer;background:var(--green);border:4px solid var(--green-d);border-radius:999px;padding:14px 46px;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+.big-btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.station-hint{margin-top:6px;font-size:14px;color:var(--ink);background:rgba(255,255,255,.75);padding:6px 16px;border-radius:999px;line-height:1.6}
+
+/* ===== 游戏视图 ===== */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 10px;width:min(680px,96%);margin:0 auto}
+.back-btn{font-family:inherit;font-weight:700;font-size:15px;color:var(--ink);background:#fff;border:3px solid var(--cream-d);border-radius:999px;padding:7px 18px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.back-btn:active{transform:translateY(2px)}
+.progress{font-family:"Fredoka","Noto Sans SC",sans-serif;font-weight:700;font-size:16px;color:var(--green-d);background:rgba(255,255,255,.9);padding:7px 16px;border-radius:999px}
+.turn-row{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(255,255,255,.94);border-radius:999px;padding:6px 16px;box-shadow:0 3px 0 rgba(0,0,0,.07);width:100%;flex-wrap:wrap;margin-bottom:8px}
+.pchip{display:flex;align-items:center;gap:8px;padding:4px 12px;border-radius:999px;border:3px solid transparent}
+.pchip img{width:40px;height:40px;object-fit:cover;border-radius:50%;border:2px solid var(--cream-d)}
+.pchip .pname{font-weight:700;font-size:15px}
+.pchip .pstars{font-size:14px;color:var(--orange);letter-spacing:1px}
+.pchip.now{background:#FFF7E8;border-color:var(--orange)}
+.turn-msg{font-weight:700;font-size:15px}
+
+/* 轨道 */
+.track-wrap{width:min(680px,96%);margin:6px auto 4px;background:#fff;border:4px solid var(--cream-d);border-radius:22px;padding:14px 14px 10px;box-shadow:0 5px 0 rgba(0,0,0,.06)}
+.track{position:relative;height:74px;background:repeating-linear-gradient(90deg,#E8D9B8 0 18px,#D8C69E 18px 20px);border-radius:12px;border:3px solid #C9B585}
+.track-inner{position:absolute;left:10px;right:10px;top:6px;bottom:8px;background:repeating-linear-gradient(90deg,#E8D9B8 0 22px,#DCC99F 22px 26px);border-radius:8px}
+.train{position:absolute;top:2px;left:4%;width:76px;height:66px;z-index:2;transition:left .9s cubic-bezier(.4,1.2,.5,1)}
+.train img{width:76px;height:66px;object-fit:contain;filter:drop-shadow(0 3px 2px rgba(0,0,0,.18))}
+.station-dots{display:flex;justify-content:space-between;position:relative;z-index:1;padding-top:6px}
+.sdot{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;min-width:0}
+.sdot .dot{width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--cream-d);font-family:"Fredoka",sans-serif;font-weight:700;font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .3s}
+.sdot .sname{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.sdot.done .dot{background:var(--green);border-color:var(--green-d);color:#fff}
+.sdot.now .dot{background:var(--orange);border-color:var(--orange-d);color:#fff;transform:scale(1.25);box-shadow:0 0 0 5px rgba(255,140,66,.25)}
+.sdot.now .sname{color:var(--orange-d)}
+.sdot.done .sname{color:var(--green-d)}
+
+/* 关卡舞台 */
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:10px;width:min(680px,94%);margin:0 auto}
+.q-bubble{font-family:"Fredoka","Noto Sans SC",sans-serif;font-weight:600;font-size:24px;color:var(--ink);background:var(--cream-d);border-radius:20px;padding:12px 26px;box-shadow:0 4px 0 rgba(0,0,0,.07);position:relative;text-align:center;max-width:100%}
+.q-bubble::before{content:"";position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);border:9px solid transparent;border-top-color:var(--cream-d)}
+.speak-btn{font-family:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--blue);border:3px solid var(--blue-d);border-radius:999px;padding:9px 22px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.12);display:flex;align-items:center;gap:8px}
+.speak-btn:active{transform:translateY(2px)}
+.speak-btn svg{width:18px;height:18px}
+.scene{background:#fff;border:4px solid var(--cream-d);border-radius:26px;padding:18px;min-height:190px;width:100%;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 rgba(0,0,0,.06);position:relative}
+.item-field{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;max-width:520px}
+.item-field img{width:56px;height:56px;object-fit:contain;animation:popIn .35s ease both}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.item-field img.rot1{transform:rotate(-8deg)}.item-field img.rot2{transform:rotate(6deg)}.item-field img.rot3{transform:rotate(-4deg)}
+.num-big{font-family:"Fredoka",sans-serif;font-weight:700;font-size:120px;color:var(--green-d);line-height:1}
+.cake-box{position:relative;width:230px;height:230px}
+.cake-img{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:200px;height:auto;border-radius:16px;object-fit:contain;z-index:1}
+.candles{position:absolute;bottom:130px;display:flex;gap:6px;justify-content:center;left:0;right:0;z-index:2}
+.candle{width:12px;height:44px;border-radius:6px 6px 3px 3px;background:repeating-linear-gradient(45deg,#FF9EB5 0 6px,#fff 6px 12px);border:1px solid #E98;position:relative;animation:popIn .3s ease both}
+.candle::before{content:"";position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:8px;height:12px;background:radial-gradient(circle at 50% 80%,#FFC94D 30%,#FF8C42 70%);border-radius:50% 50% 42% 42%;animation:flick .5s ease-in-out infinite alternate}
+@keyframes flick{from{transform:translateX(-50%) scale(1)}to{transform:translateX(-50%) scale(1.15)}}
+.letter-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.letter-card{width:110px;background:#fff;border:4px solid var(--cream-d);border-radius:20px;padding:10px 8px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 4px 0 rgba(0,0,0,.08);transition:transform .15s;font-family:inherit;color:var(--ink)}
+.letter-card img{width:70px;height:70px;object-fit:contain}
+.letter-card .l{font-family:"Fredoka",sans-serif;font-weight:700;font-size:24px;color:var(--blue)}
+.letter-card:active{transform:translateY(3px)}
+.options{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.num-opt{font-family:"Fredoka",sans-serif;font-weight:700;font-size:32px;color:var(--ink);background:#fff;border:4px solid var(--yellow);border-radius:20px;width:88px;height:72px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.1);transition:transform .12s;display:flex;align-items:center;justify-content:center}
+.num-opt:active{transform:translateY(3px)}
+.num-opt.hit{background:var(--green);border-color:var(--green-d);color:#fff;animation:popIn .35s}
+.num-opt.wide{font-size:22px;width:auto;min-width:96px;padding:0 12px}
+.num-opt.wide .num{font-size:13px;color:var(--muted);margin-left:2px}
+.num-opt.wide.hit .num{color:#EAF7EF}
+.num-opt.miss{background:var(--pink);border-color:#E86F7A;animation:shake .4s}
+.letter-card.hit{background:#E8F7EE;border-color:var(--green);animation:popIn .35s}
+.letter-card.miss{background:#FFEDF0;border-color:var(--pink);animation:shake .4s}
+.option-btn.lock{pointer-events:none;opacity:.7}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.hint-line{margin-top:6px;font-size:14px;color:var(--muted)}
+
+/* ===== 派对 ===== */
+.party-body{display:flex;flex-direction:column;align-items:center;gap:16px;padding-top:30px;text-align:center}
+.party-title{font-family:"Fredoka","Noto Sans SC",sans-serif;font-weight:700;font-size:34px;color:var(--orange-d)}
+.party-sub{font-size:17px;color:var(--ink);background:rgba(255,255,255,.88);padding:8px 20px;border-radius:999px;font-weight:500}
+.party-wall{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;background:#fff;border:4px solid var(--cream-d);border-radius:26px;padding:18px;box-shadow:0 5px 0 rgba(0,0,0,.06);max-width:560px}
+.p-item{width:76px;height:76px;background:#FFF9EE;border:3px solid var(--cream-d);border-radius:18px;display:flex;align-items:center;justify-content:center;animation:popIn .4s ease both}
+.p-item img{width:64px;height:64px;object-fit:contain}
+.score-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.score-card{background:#fff;border:4px solid var(--cream-d);border-radius:22px;padding:16px 30px;text-align:center;min-width:150px;box-shadow:0 5px 0 rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;gap:6px}
+.score-card.win{border-color:var(--orange);box-shadow:0 5px 0 rgba(0,0,0,.07),0 0 0 5px rgba(255,140,66,.22)}
+.score-card img{width:70px;height:70px;object-fit:cover;border-radius:50%;border:3px solid var(--cream-d)}
+.score-card .sc-name{font-weight:700;font-size:18px}
+.score-card .sc-stars{font-family:"Fredoka",sans-serif;font-weight:700;font-size:22px;color:var(--orange);letter-spacing:2px}
+.score-card .sc-tag{font-size:12px;font-weight:700;color:#fff;background:var(--orange);border-radius:999px;padding:3px 12px}
+.score-card.tie .sc-tag{background:var(--green)}
+.wrong-box{background:#fff;border:4px solid var(--cream-d);border-radius:26px;padding:18px 20px;max-width:560px;width:100%;text-align:left;box-shadow:0 5px 0 rgba(0,0,0,.06)}
+.wrong-box h3{font-weight:700;font-size:17px;margin-bottom:10px;color:var(--ink);display:flex;align-items:center;gap:8px}
+.wrong-box h3 svg{width:20px;height:20px}
+.w-row{display:flex;flex-direction:column;gap:4px;background:#FFF9EE;border:2px solid var(--cream-d);border-radius:14px;padding:10px 14px;margin-bottom:8px}
+.w-row .w-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--muted);font-weight:500}
+.w-row .w-head b{color:var(--ink)}
+.w-row .w-body{font-size:14px;font-weight:500;line-height:1.6}
+.w-ok{color:var(--green-d);font-weight:700}
+.w-no{color:#D64550;font-weight:700}
+.party-actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.ghost-btn{font-family:inherit;font-weight:700;font-size:17px;color:var(--ink);background:#fff;border:3px solid var(--cream-d);border-radius:999px;padding:12px 30px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.08)}
+.ghost-btn:active{transform:translateY(2px)}
+.star-fx{position:fixed;inset:0;pointer-events:none;z-index:50}
+.star{position:absolute;width:16px;height:16px;background:var(--yellow);border-radius:50%;animation:fly 1.2s ease-out forwards}
+.star.s2{background:var(--pink)}.star.s3{background:var(--blue)}
+@keyframes fly{to{transform:translateY(120px) scale(.2);opacity:0}}
+.star-big{position:fixed;font-size:30px;z-index:40;color:var(--yellow);animation:starPop 1.4s ease forwards}
+@keyframes starPop{from{transform:scale(0) rotate(0)}40%{transform:scale(1.4) rotate(20deg)}to{transform:scale(1) rotate(0);opacity:0}}
+.mute-btn{position:fixed;right:14px;bottom:14px;width:52px;height:52px;border-radius:50%;border:3px solid var(--cream-d);background:#fff;cursor:pointer;z-index:30;box-shadow:0 4px 0 rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center}
+.mute-btn svg{width:26px;height:26px}
+.mute-btn.off{opacity:.5}
+@media (max-width:520px){
+  .logo{font-size:34px}
+  .num-opt{width:80px;height:66px;font-size:28px}
+  .item-field img{width:46px;height:46px}
+  .q-bubble{font-size:20px}
+  .scene{min-height:170px}
+  .letter-card{width:96px}
+}
+</style>
+</head>
+<body>
+<div id="bg">
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+</div>
+
+<div id="app">
+
+  <!-- ===== 主页 ===== -->
+  <section class="view fade-in" id="view-home">
+    <div class="home-body">
+      <h1 class="logo">森林数字列车</h1>
+      <div class="logo-en">NUMBER TRAIN</div>
+      <p class="home-sub">开着小火车，边玩边学数字 1-15</p>
+      <div class="mode-pick">
+        <button class="mode-btn sel" data-mode="single">单人玩</button>
+        <button class="mode-btn" data-mode="duo">双人对战</button>
+      </div>
+      <p class="pick-title" id="pickTitle">选一个列车长</p>
+      <div class="hero-cards">
+        <button class="hero-card" data-hero="panda"><img src="assets/hero-panda.png" alt="小熊猫"><span>小熊猫</span></button>
+        <button class="hero-card" data-hero="fox"><img src="assets/hero-fox.png" alt="小狐狸"><span>小狐狸</span></button>
+        <button class="hero-card" data-hero="penguin"><img src="assets/hero-penguin.png" alt="小企鹅"><span>小企鹅</span></button>
+      </div>
+      <div class="name-row">
+        <label for="nameInput">我的英文名</label>
+        <input id="nameInput" maxlength="10" value="Ben" autocomplete="off">
+      </div>
+      <div class="name-row" id="nameRow2" hidden>
+        <label for="nameInput2">2P 英文名</label>
+        <input id="nameInput2" maxlength="10" value="Amy" autocomplete="off">
+      </div>
+      <div class="start-area">
+        <button class="big-btn" id="startBtn">出发！</button>
+        <p class="station-hint">6 站：数一数 → 听一听 → 生日蜡烛 → 字母站 → 再听一听 → 再数一数<br>双人对战时每人轮流答 3 题</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 游戏关卡 ===== -->
+  <section class="view fade-in" id="view-game" hidden>
+    <header class="topbar">
+      <button class="back-btn" id="gameBack">返回</button>
+      <div class="progress" id="gameProgress">第 1 / 5 站</div>
+    </header>
+    <div class="turn-row" id="turnRow" hidden></div>
+    <div class="track-wrap">
+      <div class="track">
+        <div class="track-inner"></div>
+        <div class="train" id="train"><img src="assets/train.png" alt="火车"></div>
+      </div>
+      <div class="station-dots" id="stationDots"></div>
+    </div>
+    <div class="stage">
+      <div class="q-bubble" id="qBubble"></div>
+      <button class="speak-btn" id="qSpeak">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path d="M16 9c1.5 1.5 1.5 4.5 0 6M18.5 6.5c3 3 3 8 0 11" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        再听一遍
+      </button>
+      <div class="scene" id="scene"></div>
+      <div class="options" id="options"></div>
+      <p class="hint-line" id="hintLine"></p>
+    </div>
+  </section>
+
+  <!-- ===== 终点派对 ===== -->
+  <section class="view fade-in" id="view-party" hidden>
+    <div class="party-body">
+      <h2 class="party-title">终点站到啦！</h2>
+      <p class="party-sub" id="partySub">You did it! 森林数字列车顺利到站</p>
+      <div class="score-cards" id="scoreCards"></div>
+      <div class="party-wall" id="partyWall"></div>
+      <div class="wrong-box" id="wrongBox" hidden>
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L15 8.5L22 9.3L17 14.1L18.2 21L12 17.8L5.8 21L7 14.1L2 9.3L9 8.5L12 2z" fill="#FFD34D" stroke="#E8A63B" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          错题回顾
+        </h3>
+        <div id="wrongList"></div>
+      </div>
+      <div class="party-actions">
+        <button class="big-btn" id="replayBtn">再玩一次</button>
+        <button class="ghost-btn" id="homeBtn">回车站</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<button class="mute-btn" id="muteBtn" title="声音开关">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#3B2E2A"/><path class="wave" d="M16 9c1.5 1.5 1.5 4.5 0 6M18.5 6.5c3 3 3 8 0 11" stroke="#3B2E2A" stroke-width="2" stroke-linecap="round"/></svg>
+</button>
+
+<!-- 图池 -->
+<div id="imgPool" hidden>
+  <img id="img-hero-panda" src="assets/hero-panda.png" alt="panda">
+  <img id="img-hero-fox" src="assets/hero-fox.png" alt="fox">
+  <img id="img-hero-penguin" src="assets/hero-penguin.png" alt="penguin">
+  <img id="img-item-apple" src="assets/item-apple.png" alt="apple">
+  <img id="img-item-star" src="assets/item-star.png" alt="star">
+  <img id="img-item-basketball" src="assets/item-basketball.png" alt="basketball">
+  <img id="img-cake" src="assets/cake.png" alt="cake">
+  <img id="img-letter-e" src="assets/letter-e.png" alt="e">
+  <img id="img-letter-f" src="assets/letter-f.png" alt="f">
+  <img id="img-letter-g" src="assets/letter-g.png" alt="g">
+  <img id="img-letter-h" src="assets/letter-h.png" alt="h">
+  <img id="img-train" src="assets/train.png" alt="train">
+</div>
+
+<!-- 语音池 -->
+<div id="audioPool" hidden>
+  <audio id="audio-n-one" src="assets/voice/n-one.mp3" preload="auto"></audio>
+  <audio id="audio-n-two" src="assets/voice/n-two.mp3" preload="auto"></audio>
+  <audio id="audio-n-three" src="assets/voice/n-three.mp3" preload="auto"></audio>
+  <audio id="audio-n-four" src="assets/voice/n-four.mp3" preload="auto"></audio>
+  <audio id="audio-n-five" src="assets/voice/n-five.mp3" preload="auto"></audio>
+  <audio id="audio-n-six" src="assets/voice/n-six.mp3" preload="auto"></audio>
+  <audio id="audio-n-seven" src="assets/voice/n-seven.mp3" preload="auto"></audio>
+  <audio id="audio-n-eight" src="assets/voice/n-eight.mp3" preload="auto"></audio>
+  <audio id="audio-n-nine" src="assets/voice/n-nine.mp3" preload="auto"></audio>
+  <audio id="audio-n-ten" src="assets/voice/n-ten.mp3" preload="auto"></audio>
+  <audio id="audio-n-eleven" src="assets/voice/n-eleven.mp3" preload="auto"></audio>
+  <audio id="audio-n-twelve" src="assets/voice/n-twelve.mp3" preload="auto"></audio>
+  <audio id="audio-n-thirteen" src="assets/voice/n-thirteen.mp3" preload="auto"></audio>
+  <audio id="audio-n-fourteen" src="assets/voice/n-fourteen.mp3" preload="auto"></audio>
+  <audio id="audio-n-fifteen" src="assets/voice/n-fifteen.mp3" preload="auto"></audio>
+  <audio id="audio-q-apples" src="assets/voice/q-apples.mp3" preload="auto"></audio>
+  <audio id="audio-q-stars" src="assets/voice/q-stars.mp3" preload="auto"></audio>
+  <audio id="audio-q-basketballs" src="assets/voice/q-basketballs.mp3" preload="auto"></audio>
+  <audio id="audio-q-old" src="assets/voice/q-old.mp3" preload="auto"></audio>
+  <audio id="audio-w-egg" src="assets/voice/w-egg.mp3" preload="auto"></audio>
+  <audio id="audio-w-fish" src="assets/voice/w-fish.mp3" preload="auto"></audio>
+  <audio id="audio-w-goat" src="assets/voice/w-goat.mp3" preload="auto"></audio>
+  <audio id="audio-w-hen" src="assets/voice/w-hen.mp3" preload="auto"></audio>
+  <audio id="audio-fb-great" src="assets/voice/fb-great.mp3" preload="auto"></audio>
+  <audio id="audio-fb-try" src="assets/voice/fb-try.mp3" preload="auto"></audio>
+</div>
+
+<script>
+'use strict';
+/* ===== 数据 ===== */
+const HEROES = { panda:'hero-panda', fox:'hero-fox', penguin:'hero-penguin' };
+const ITEMS = {
+  apple:      { img:'item-apple',      q:'q-apples' },
+  star:       { img:'item-star',       q:'q-stars' },
+  basketball: { img:'item-basketball', q:'q-basketballs' }
+};
+const LETTERS = [
+  { letter:'E', img:'letter-e', word:'egg',  zh:'鸡蛋' },
+  { letter:'F', img:'letter-f', word:'fish', zh:'小鱼' },
+  { letter:'G', img:'letter-g', word:'goat', zh:'山羊' },
+  { letter:'H', img:'letter-h', word:'hen',  zh:'母鸡' }
+];
+const NUM_WORDS = ['one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen'];
+const STATION_DEFS = [
+  { type:'count',   name:'数一数' },
+  { type:'listen',  name:'听一听' },
+  { type:'birthday',name:'生日' },
+  { type:'letters', name:'字母' },
+  { type:'listen',  name:'再听一听' },
+  { type:'count',   name:'再数一数' }
+];
+const VOICE = {
+  'q-apples':'q-apples','q-stars':'q-stars','q-basketballs':'q-basketballs','q-old':'q-old',
+  'fb-great':'fb-great','fb-try':'fb-try',
+  egg:'w-egg', fish:'w-fish', goat:'w-goat', hen:'w-hen'
+};
+NUM_WORDS.forEach(w=>VOICE['n-'+w] = 'n-'+w);
+
+/* ===== 工具 ===== */
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function imgByKey(key){ return document.getElementById('img-'+key).cloneNode(true); }
+function ri(min,max){ return min + Math.floor(Math.random()*(max-min+1)); }
+
+/* ===== 语音（内置音频） ===== */
+let soundOn = true;
+let voiceEl = null;
+function speak(key){
+  if(!soundOn) return;
+  stopSpeak();
+  const id = VOICE[key];
+  if(!id) return;
+  voiceEl = document.getElementById('audio-' + id);
+  if(voiceEl){
+    voiceEl.currentTime = 0;
+    const pr = voiceEl.play();
+    if(pr && pr.catch) pr.catch(()=>{});
+  }
+}
+function stopSpeak(){
+  if(voiceEl){ try{ voiceEl.pause(); }catch(e){} }
+}
+
+/* ===== 音效 ===== */
+let actx = null;
+function ensureAudio(){
+  if(!actx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    actx = new AC();
+  }
+  if(actx.state === 'suspended') actx.resume();
+  return actx;
+}
+function beep(freq, dur, type, vol, delay){
+  if(!soundOn) return;
+  const ctx = ensureAudio();
+  if(!ctx) return;
+  const t0 = ctx.currentTime + (delay||0);
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = type||'sine';
+  osc.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol||0.18, t0+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+  osc.connect(g).connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0+dur+0.05);
+}
+function sfxCorrect(){ beep(523,0.12,'sine',0.2); beep(659,0.12,'sine',0.2,0.11); beep(784,0.22,'sine',0.22,0.22); }
+function sfxWrong(){ beep(196,0.22,'sawtooth',0.12); beep(147,0.3,'sawtooth',0.12,0.16); }
+function sfxWin(){ [523,659,784,1047].forEach((f,i)=>beep(f,0.16,'triangle',0.22,i*0.13)); }
+
+/* ===== 星星特效 ===== */
+function burstStars(originEl){
+  const fx = document.createElement('div');
+  fx.className = 'star-fx';
+  document.body.appendChild(fx);
+  const r = originEl.getBoundingClientRect();
+  const cx = r.left + r.width/2;
+  const cy = r.top + r.height/2;
+  for(let i=0;i<12;i++){
+    const s = document.createElement('span');
+    s.className = 'star' + (i%3===0?' s2':(i%3===1?' s3':''));
+    s.style.left = (cx + (Math.random()*120-60)) + 'px';
+    s.style.top = (cy + (Math.random()*30-10)) + 'px';
+    s.style.animationDelay = (Math.random()*0.25) + 's';
+    fx.appendChild(s);
+  }
+  setTimeout(()=>fx.remove(), 1600);
+}
+
+/* ===== 状态 ===== */
+let mode = 'single';
+let hero = 'panda';
+let myName = 'Ben';
+let p1Hero = null, p2Hero = null;
+let p1Name = 'Ben', p2Name = 'Amy';
+let scores = [0, 0];
+let current = 0;
+let turnCount = 0;
+let stationIdx = 0;
+let locked = false;
+let q = null; // 当前题目
+let wrongLog = []; // 错题记录
+
+/* ===== 错题文案 ===== */
+function qLabel(q){
+  if(q.type==='count'){
+    const zh = {apple:'苹果', star:'星星', basketball:'篮球'}[q.itemKey] || q.itemKey;
+    return '数' + zh + ' · How many ' + q.itemKey + 's are there?';
+  }
+  if(q.type==='listen') return '听数字 · 哪个数字？';
+  if(q.type==='birthday') return '生日蜡烛 · How old are you?';
+  return '字母 ' + q.letter.letter + ' · 听 ' + q.word + '（' + q.letter.zh + '）';
+}
+function ansText(q, val){
+  if(q.type==='letters') return val;
+  return NUM_WORDS[val-1] + ' (' + val + ')';
+}
+
+/* ===== 视图切换 ===== */
+const VIEWS = { home:'view-home', game:'view-game', party:'view-party' };
+function showView(name){
+  stopSpeak();
+  Object.keys(VIEWS).forEach(k=>{ document.getElementById(VIEWS[k]).hidden = (k!==name); });
+}
+
+/* ===== 主页 ===== */
+function tagEl(t){
+  const s = document.createElement('span');
+  s.className = 'tag';
+  s.textContent = t;
+  return s;
+}
+function resetHeroPicks(){
+  p1Hero = null; p2Hero = null;
+  heroCards.forEach(c=>{
+    c.classList.remove('sel','p1','p2','taken');
+    const tag = c.querySelector('.tag');
+    if(tag) tag.remove();
+  });
+  const t = document.getElementById('pickTitle');
+  if(mode==='duo'){
+    t.textContent = '1P 先选列车长';
+    document.getElementById('startBtn').textContent = '对战出发';
+  }else{
+    t.textContent = '选一个列车长';
+    heroCards[0].classList.add('sel');
+    document.getElementById('startBtn').textContent = '出发！';
+  }
+}
+const modeBtns = document.querySelectorAll('.mode-btn');
+modeBtns.forEach(b=>{
+  b.addEventListener('click', ()=>{
+    if(b.classList.contains('sel')) return;
+    mode = b.dataset.mode;
+    modeBtns.forEach(x=>x.classList.toggle('sel', x===b));
+    document.getElementById('nameRow2').hidden = (mode!=='duo');
+    resetHeroPicks();
+  });
+});
+const heroCards = document.querySelectorAll('.hero-card');
+heroCards.forEach(card=>{
+  card.addEventListener('click', ()=>{
+    const h = card.dataset.hero;
+    if(mode==='duo'){
+      if(!p1Hero){
+        p1Hero = h;
+        card.classList.add('p1');
+        card.appendChild(tagEl('1P'));
+        heroCards.forEach(c=>{ if(c.dataset.hero!==h) c.classList.add('taken'); });
+        document.getElementById('pickTitle').textContent = '2P 再选一个，别和 1P 一样哦';
+      }else if(!p2Hero && h!==p1Hero){
+        p2Hero = h;
+        card.classList.add('p2');
+        card.appendChild(tagEl('2P'));
+        heroCards.forEach(c=>{ if(c.dataset.hero===h) c.classList.add('taken'); });
+        document.getElementById('pickTitle').textContent = '两个都选好啦，出发！';
+      }
+    }else{
+      hero = h;
+      heroCards.forEach(c=>c.classList.toggle('sel', c===card));
+    }
+  });
+});
+heroCards[0].classList.add('sel');
+
+/* ===== 双人计分条 ===== */
+function updateTurnUI(){
+  const show = (mode==='duo');
+  const el = document.getElementById('turnRow');
+  el.hidden = !show;
+  if(!show) return;
+  el.innerHTML = '';
+  [0,1].forEach(p=>{
+    const chip = document.createElement('div');
+    chip.className = 'pchip' + (p===current ? ' now' : '');
+    chip.appendChild(imgByKey(HEROES[p===0?p1Hero:p2Hero]));
+    const nm = document.createElement('span');
+    nm.className = 'pname';
+    nm.textContent = p===0 ? p1Name : p2Name;
+    chip.appendChild(nm);
+    const st = document.createElement('span');
+    st.className = 'pstars';
+    st.textContent = '★'.repeat(scores[p]);
+    chip.appendChild(st);
+    el.appendChild(chip);
+  });
+  const msg = document.createElement('span');
+  msg.className = 'turn-msg';
+  msg.textContent = '轮到 ' + (current===0?p1Name:p2Name) + '！';
+  el.appendChild(msg);
+}
+
+/* ===== 轨道 ===== */
+function renderTrack(){
+  const box = document.getElementById('stationDots');
+  box.innerHTML = '';
+  STATION_DEFS.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'sdot' + (i<stationIdx ? ' done' : (i===stationIdx ? ' now' : ''));
+    d.innerHTML = '<div class="dot">' + (i<stationIdx ? '✓' : (i+1)) + '</div><div class="sname">' + s.name + '</div>';
+    box.appendChild(d);
+  });
+  const pct = 4 + (stationIdx / (STATION_DEFS.length-1)) * 78;
+  document.getElementById('train').style.left = pct + '%';
+}
+
+/* ===== 题目生成 ===== */
+function makeOptions(answer, min, max){
+  const set = new Set([answer]);
+  let guard = 0;
+  while(set.size < 3 && guard++ < 50){
+    const cand = answer + ri(-4, 4);
+    if(cand >= min && cand <= max) set.add(cand);
+  }
+  while(set.size < 3){
+    set.add(ri(min, max));
+  }
+  return shuffle([...set]);
+}
+
+function genQuestion(){
+  const def = STATION_DEFS[stationIdx];
+  const type = def.type;
+  if(type === 'count'){
+    const keys = Object.keys(ITEMS);
+    const itemKey = keys[ri(0, keys.length-1)];
+    const item = ITEMS[itemKey];
+    const n = (stationIdx === 0) ? ri(4, 8) : ri(9, 15);
+    q = { type:'count', item:item, itemKey:itemKey, n:n, answer:n, qKey:item.q, speakKey:'n-'+NUM_WORDS[n-1] };
+  }else if(type === 'listen'){
+    const n = ri(6, 12);
+    q = { type:'listen', n:n, answer:n, qKey:'n-'+NUM_WORDS[n-1], speakKey:'n-'+NUM_WORDS[n-1] };
+  }else if(type === 'birthday'){
+    const n = ri(3, 10);
+    q = { type:'birthday', n:n, answer:n, qKey:'q-old', speakKey:'n-'+NUM_WORDS[n-1] };
+  }else if(type === 'letters'){
+    const idx = ri(0, LETTERS.length-1);
+    const L = LETTERS[idx];
+    q = { type:'letters', letter:L, answer:L.letter, qKey:L.word, speakKey:L.word };
+  }
+}
+
+function renderScene(){
+  const scene = document.getElementById('scene');
+  scene.innerHTML = '';
+  const t = q.type;
+  if(t === 'count'){
+    const field = document.createElement('div');
+    field.className = 'item-field';
+    for(let i=0;i<q.n;i++){
+      const im = imgByKey(q.item.img);
+      im.classList.add('rot' + (i%3));
+      im.style.animationDelay = (i*0.03) + 's';
+      field.appendChild(im);
+    }
+    scene.appendChild(field);
+    document.getElementById('qBubble').textContent = 'How many ' + q.itemKey + 's are there?';
+  }else if(t === 'listen'){
+    const nb = document.createElement('div');
+    nb.className = 'num-big';
+    nb.textContent = '?';
+    scene.appendChild(nb);
+    document.getElementById('qBubble').textContent = '听一听，是几？';
+  }else if(t === 'birthday'){
+    const box = document.createElement('div');
+    box.className = 'cake-box';
+    const candles = document.createElement('div');
+    candles.className = 'candles';
+    for(let i=0;i<q.n;i++){
+      const c = document.createElement('div');
+      c.className = 'candle';
+      c.style.animationDelay = (i*0.05) + 's';
+      candles.appendChild(c);
+    }
+    box.appendChild(candles);
+    const ck = imgByKey('cake');
+    ck.className = 'cake-img';
+    box.appendChild(ck);
+    scene.appendChild(box);
+    document.getElementById('qBubble').textContent = 'How old are you?';
+  }else if(t === 'letters'){
+    const cards = document.createElement('div');
+    cards.className = 'letter-cards';
+    q._shuffledLetters = shuffle(LETTERS.slice());
+    q._shuffledLetters.forEach(L=>{
+      const c = document.createElement('button');
+      c.className = 'letter-card';
+      c.appendChild(imgByKey(L.img));
+      const l = document.createElement('span');
+      l.className = 'l';
+      l.textContent = L.letter;
+      c.appendChild(l);
+      c.addEventListener('click', ()=>onPick(c, L.letter));
+      cards.appendChild(c);
+    });
+    scene.appendChild(cards);
+    document.getElementById('qBubble').textContent = '听一听，是哪个字母？';
+  }
+}
+
+function renderOptions(){
+  const box = document.getElementById('options');
+  box.innerHTML = '';
+  if(q.type === 'letters'){
+    // 字母选项已放在场景里，这里不需要
+    document.getElementById('hintLine').textContent = '';
+    return;
+  }
+  const opts = makeOptions(q.answer, 1, 15);
+  opts.forEach(n=>{
+    const b = document.createElement('button');
+    b.className = 'num-opt';
+    b.dataset.n = n;
+    if(q.type === 'count'){
+      b.classList.add('wide');
+      b.innerHTML = NUM_WORDS[n-1] + '<span class="num">' + n + '</span>';
+    }else{
+      b.textContent = n;
+    }
+    b.addEventListener('click', ()=>onPick(b, n));
+    box.appendChild(b);
+  });
+  document.getElementById('hintLine').textContent = (q.type==='count' ? '数一数，选英文数字' : '点一个数字');
+}
+
+function showStation(){
+  locked = false;
+  if(mode==='duo'){ current = turnCount % 2; turnCount++; updateTurnUI(); }
+  genQuestion();
+  renderTrack();
+  renderScene();
+  renderOptions();
+  document.getElementById('gameProgress').textContent = '第 ' + (stationIdx+1) + ' / ' + STATION_DEFS.length + ' 站';
+  setTimeout(()=>speak(q.qKey), 350);
+}
+
+/* ===== 答题 ===== */
+function nextStation(){
+  stationIdx++;
+  if(stationIdx < STATION_DEFS.length) showStation();
+  else showParty();
+}
+
+function onPick(el, val){
+  if(locked) return;
+  locked = true;
+  if(val === q.answer){
+    scores[current]++;
+    el.classList.add('hit');
+    sfxCorrect();
+    burstStars(el);
+    speak(q.speakKey);
+    setTimeout(()=>nextStation(), 1100);
+  }else{
+    wrongLog.push({
+      player: mode==='duo' ? (current===0 ? p1Name : p2Name) : myName,
+      station: STATION_DEFS[stationIdx].name,
+      qText: qLabel(q),
+      correct: ansText(q, q.answer),
+      wrong: ansText(q, val)
+    });
+    el.classList.add('miss');
+    sfxWrong();
+    speak('fb-try');
+    if(mode==='duo'){
+      setTimeout(()=>{
+        el.classList.remove('miss');
+        nextStation();
+      }, 900);
+    }else{
+      document.querySelectorAll('#options .num-opt, #scene .letter-card').forEach(b=>b.classList.add('lock'));
+      setTimeout(()=>{
+        el.classList.remove('miss');
+        document.querySelectorAll('#options .num-opt, #scene .letter-card').forEach(b=>b.classList.remove('lock'));
+        locked = false;
+        speak(q.qKey);
+      }, 900);
+    }
+  }
+}
+
+/* ===== 派对 ===== */
+function showParty(){
+  showView('party');
+  sfxWin();
+  const sub = document.getElementById('partySub');
+  const wall = document.getElementById('partyWall');
+  const cards = document.getElementById('scoreCards');
+  const wrongBox = document.getElementById('wrongBox');
+  const wrongList = document.getElementById('wrongList');
+  wall.innerHTML = '';
+  cards.innerHTML = '';
+  wrongList.innerHTML = '';
+  const mkCard = (heroKey, name, stars, win, tie)=>{
+    const c = document.createElement('div');
+    c.className = 'score-card' + (tie ? ' tie' : (win ? ' win' : ''));
+    c.appendChild(imgByKey(heroKey));
+    const nm = document.createElement('div');
+    nm.className = 'sc-name';
+    nm.textContent = name;
+    c.appendChild(nm);
+    const st = document.createElement('div');
+    st.className = 'sc-stars';
+    st.textContent = '★'.repeat(stars);
+    c.appendChild(st);
+    if(tie){
+      const t = document.createElement('div');
+      t.className = 'sc-tag';
+      t.textContent = '平局';
+      c.appendChild(t);
+    }else if(win){
+      const t = document.createElement('div');
+      t.className = 'sc-tag';
+      t.textContent = '赢家';
+      c.appendChild(t);
+    }
+    return c;
+  };
+  const items = [];
+  if(mode==='duo'){
+    let msg = p1Name + ' ' + scores[0] + ' 星 · ' + p2Name + ' ' + scores[1] + ' 星';
+    if(scores[0]===scores[1]) msg += '，平局！都好棒！';
+    else msg += '，' + (scores[0]>scores[1]?p1Name:p2Name) + ' 赢啦！';
+    sub.textContent = msg;
+    cards.appendChild(mkCard(HEROES[p1Hero], p1Name, scores[0], scores[0]>scores[1], scores[0]===scores[1]));
+    cards.appendChild(mkCard(HEROES[p2Hero], p2Name, scores[1], scores[1]>scores[0], scores[0]===scores[1]));
+    items.push(HEROES[p1Hero], HEROES[p2Hero]);
+  }else{
+    sub.textContent = myName + ' 完成全部 5 站 · 答对 ' + scores[0] + ' 题，超棒的！';
+    cards.appendChild(mkCard(HEROES[hero], myName, scores[0], false, false));
+    items.push(HEROES[hero]);
+  }
+  items.push('train');
+  ['item-apple','item-star','item-basketball','cake','letter-e','letter-f','letter-g','letter-h'].forEach(k=>items.push(k));
+  items.forEach(k=>{
+    const it = document.createElement('div');
+    it.className = 'p-item';
+    it.appendChild(imgByKey(k));
+    wall.appendChild(it);
+  });
+  if(wrongLog.length){
+    wrongBox.hidden = false;
+    wrongLog.forEach(r=>{
+      const row = document.createElement('div');
+      row.className = 'w-row';
+      row.innerHTML =
+        '<div class="w-head"><b>' + r.station + '</b><span>' + r.player + '</span></div>' +
+        '<div class="w-body">' + r.qText + '</div>' +
+        '<div class="w-body">正确答案 <span class="w-ok">' + r.correct + '</span>　你选了 <span class="w-no">' + r.wrong + '</span></div>';
+      wrongList.appendChild(row);
+    });
+  }else{
+    wrongBox.hidden = true;
+  }
+  for(let i=0;i<8;i++){
+    const s = document.createElement('span');
+    s.className = 'star-big';
+    s.textContent = '★';
+    s.style.left = (8 + i*11) + '%';
+    s.style.animationDelay = (i*0.15) + 's';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 2600);
+  }
+}
+
+/* ===== 初始化 ===== */
+function startGame(){
+  if(mode==='duo'){
+    if(!p1Hero || !p2Hero){
+      document.getElementById('pickTitle').textContent = '1P 和 2P 都要选好才能出发哦';
+      return;
+    }
+    p1Name = document.getElementById('nameInput').value.trim() || 'Ben';
+    p2Name = document.getElementById('nameInput2').value.trim() || 'Amy';
+    scores = [0, 0];
+    current = 0;
+    turnCount = 0;
+  }else{
+    myName = document.getElementById('nameInput').value.trim() || 'Ben';
+    hero = [...heroCards].find(c=>c.classList.contains('sel'))?.dataset.hero || 'panda';
+  }
+  stationIdx = 0;
+  wrongLog = [];
+  showView('game');
+  updateTurnUI();
+  showStation();
+}
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') startGame(); });
+document.getElementById('gameBack').addEventListener('click', ()=>showView('home'));
+document.getElementById('homeBtn').addEventListener('click', ()=>showView('home'));
+document.getElementById('replayBtn').addEventListener('click', startGame);
+document.getElementById('qSpeak').addEventListener('click', ()=>{ if(q) speak(q.qKey); });
+const muteBtn = document.getElementById('muteBtn');
+muteBtn.addEventListener('click', ()=>{
+  soundOn = !soundOn;
+  muteBtn.classList.toggle('off', !soundOn);
+  if(!soundOn) stopSpeak();
+});
+showView('home');
+</script>
+</body>
+</html>
